@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predicción de Partidos de Fútbol</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            background-size: cover;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.8); /* Fondo negro con baja opacidad */
+            padding: 40px; /* Reducir padding */
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 40%;
+            max-width: 800px;
+            text-align: center;
+            box-sizing: border-box; /* Asegurarse de que el padding no aumente el tamaño */
+        }
+        h2 {
+            text-align: center;
+            color: #fff; /* Texto en blanco */
+            margin-bottom: 10px;
+        }
+        .logo {
+            max-width: 80px; /* Reducir tamaño del logo */
+            margin-bottom: 10px;
+            margin-top: 10px;
+            border-radius: 10%;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%; /* Asegurar que el formulario ocupe todo el espacio */
+        }
+        .form-group {
+            width: 48%;
+            margin-bottom: 15px; /* Reducir margen inferior */
+        }
+        .form-group-full {
+            width: 100%;
+            margin-bottom: 15px; /* Reducir margen inferior */
+        }
+        label {
+            display: block;
+            color: #ddd; /* Color del texto en gris claro */
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 8px; /* Reducir padding */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px; /* Reducir tamaño de fuente */
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 15px; /* Reducir margen superior */
+            width: 100%;
+            padding: 10px; /* Reducir padding */
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px; /* Reducir tamaño de fuente */
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        h3 {
+            text-align: center;
+            color: #28a745;
+            margin-top: 15px; /* Reducir margen superior */
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop class="background-video">
+        <source src="/Source/Fondo.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+    <div class="container">
+        <h2>Predecir el Resultado de un Partido de Fútbol</h2>
+        <img src="/Source/Logo.png" alt="Logo" class="logo">
+        <form id="predictionForm" action="/predict" method="post">
+            <div class="form-group">
+                <label for="team">Equipo:</label>
+                <select id="team" name="team" required onchange="validateTeams()">
+                    <option value="">Selecciona un equipo</option>
+                    <option value="Manchester City">Manchester City</option>
+                    <option value="Liverpool">Liverpool</option>
+                    <option value="Chelsea">Chelsea</option>
+                    <option value="Arsenal">Arsenal</option>
+                    <option value="Manchester United">Manchester United</option>
+                    <option value="Tottenham Hotspur">Tottenham Hotspur</option>
+                    <option value="Leicester City">Leicester City</option>
+                    <option value="Everton">Everton</option>
+                    <option value="Leeds United">Leeds United</option>
+                    <option value="West Ham United">West Ham United</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="opponent">Oponente:</label>
+                <select id="opponent" name="opponent" required onchange="validateTeams()">
+                    <option value="">Selecciona un oponente</option>
+                    <option value="Manchester City">Manchester City</option>
+                    <option value="Liverpool">Liverpool</option>
+                    <option value="Chelsea">Chelsea</option>
+                    <option value="Arsenal">Arsenal</option>
+                    <option value="Manchester United">Manchester United</option>
+                    <option value="Tottenham Hotspur">Tottenham Hotspur</option>
+                    <option value="Leicester City">Leicester City</option>
+                    <option value="Everton">Everton</option>
+                    <option value="Leeds United">Leeds United</option>
+                    <option value="West Ham United">West Ham United</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="venue">Lugar:</label>
+                <select id="venue" name="venue" required>
+                    <option value="">Selecciona un lugar</option>
+                    <option value="Home">Local</option>
+                    <option value="Away">Visitante</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="gf">Goles a Favor:</label>
+                <input type="number" id="gf" name="gf" required>
+            </div>
+            <div class="form-group">
+                <label for="ga">Goles en Contra:</label>
+                <input type="number" id="ga" name="ga" required>
+            </div>
+            <div class="form-group">
+                <label for="poss">Posesión (%):</label>
+                <input type="number" id="poss" name="poss" required>
+            </div>
+            <div class="form-group">
+                <label for="sh">Tiros:</label>
+                <input type="number" id="sh" name="sh" required>
+            </div>
+            <div class="form-group">
+                <label for="sot">Tiros a Puerta:</label>
+                <input type="number" id="sot" name="sot" required>
+            </div>
+            <div class="form-group-full">
+                <label for="dist">Distancia Promedio de Tiro (m):</label>
+                <input type="number" id="dist" name="dist" required>
+            </div>
+            <button type="submit">Predecir</button>
+        </form>
+        <h3>{{ prediction_text }}</h3>
+    </div>
+    <script>
+        function validateTeams() {
+            const team = document.getElementById('team').value;
+            const opponent = document.getElementById('opponent').value;
+            const submitButton = document.querySelector('button[type="submit"]');
+            
+            if (team && opponent && team === opponent) {
+                alert('El equipo y el oponente no pueden ser el mismo.');
+                submitButton.disabled = true;
+            } else {
+                submitButton.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
