@@ -9,6 +9,21 @@ from sklearn.metrics import accuracy_score, classification_report
 matches_path = 'matches.csv'
 matches_df = pd.read_csv(matches_path)
 
+# Normalizar los nombres de los equipos
+team_replacements = {
+    'Manchester Utd': 'Manchester United',
+    'Tottenham': 'Tottenham Hotspur',
+    'Wolves': 'Wolverhampton Wanderers',
+    'Newcastle Utd': 'Newcastle United',
+    'Brighton': 'Brighton and Hove Albion',
+    'Sheffield Utd': 'Sheffield United',
+    'West Ham': 'West Ham United',
+    'West Brom': '    '
+}
+
+matches_df['team'] = matches_df['team'].replace(team_replacements)
+matches_df['opponent'] = matches_df['opponent'].replace(team_replacements)
+
 # Seleccionar las columnas relevantes
 features = ['team', 'opponent', 'venue', 'gf', 'ga', 'poss', 'sh', 'sot', 'dist']
 target = 'result'
@@ -34,8 +49,17 @@ matches_df['venue'] = venue_encoder.fit_transform(matches_df['venue'])
 X = matches_df[features]
 y = matches_df[target]
 
-# Dividir los datos en conjuntos de entrenamiento y prueba
+# Verificar si hay equipos en el conjunto de prueba que no están en el conjunto de entrenamiento
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+train_teams = set(X_train['team']).union(set(X_train['opponent']))
+test_teams = set(X_test['team']).union(set(X_test['opponent']))
+
+if not test_teams.issubset(train_teams):
+    unseen_teams = test_teams - train_teams
+    print(f"Equipos no vistos en el conjunto de entrenamiento: {unseen_teams}")
+    X_train = X_train[X_train['team'].isin(train_teams) & X_train['opponent'].isin(train_teams)]
+    y_train = y_train[X_train.index]
 
 # Entrenar el modelo
 model = RandomForestClassifier(n_estimators=100, random_state=42)
